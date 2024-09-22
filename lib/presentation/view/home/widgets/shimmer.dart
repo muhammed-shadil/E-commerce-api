@@ -25,7 +25,8 @@ class ShimmerCard extends StatelessWidget {
             height: 120,
             width: 100,
             decoration: BoxDecoration(
-                color: Colors.amber, borderRadius: BorderRadius.circular(10)),
+                color: const Color.fromARGB(255, 237, 237, 236),
+                borderRadius: BorderRadius.circular(10)),
           ),
         );
       },

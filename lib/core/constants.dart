@@ -19,8 +19,11 @@ class Constants {
 ///
 class Styles {
   static const TextStyle titlestyle =
-      TextStyle(color: Constants.primarycolor, fontWeight: FontWeight.bold);
+      TextStyle(color: Constants.primarycolor, fontWeight: FontWeight.bold,fontSize: 18);
 
+
+  static const TextStyle authbuttonstyle =
+      TextStyle(color: Constants.primarycolor, fontWeight: FontWeight.bold,);
   static const TextStyle cardtitlestyle =
       TextStyle(color: Constants.black, fontWeight: FontWeight.bold);
 

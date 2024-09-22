@@ -36,6 +36,7 @@ class MyApp extends StatelessWidget {
         )
       ],
       child: MaterialApp(
+        theme: ThemeData(fontFamily: "poppin"),
         debugShowCheckedModeBanner: false,
         home: user != null ? const HomeScreen() : SignupScreen(),
       ),
