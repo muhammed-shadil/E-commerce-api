@@ -1,6 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_remote_config/firebase_remote_config.dart';
 import 'package:flutter/material.dart';
 import 'package:mechine_test_pinkolearn/core/constants.dart';
 
@@ -8,11 +7,11 @@ enum Status { signedIn, loggedIn, error, initial, loggedOut }
 
 class AuthProvider extends ChangeNotifier {
   final FirebaseAuth _auth = FirebaseAuth.instance;
-  final remoteConfig = FirebaseRemoteConfig.instance;
   late UserCredential userCredential;
   bool isLoading = false;
   String error = '';
   Status status = Status.initial;
+
   Future<void> logIn({
     required String email,
     required String password,
@@ -26,38 +25,36 @@ class AuthProvider extends ChangeNotifier {
       userCredential = await _auth.signInWithEmailAndPassword(
           email: email, password: password);
       final user = userCredential.user;
+
       if (user != null) {
-        print('login');
         status = Status.loggedIn;
-        notifyListeners();
+        print('Login successful');
       } else {
+        error = 'Authentication failed';
         status = Status.error;
-        error = 'Error Logging In';
-        notifyListeners();
+      }
+    } on FirebaseAuthException catch (e) {
+      switch (e.code) {
+        case 'user-not-found':
+          error = 'No user found for that email.';
+          break;
+        case 'wrong-password':
+          error = 'Incorrect password provided.';
+          break;
+        case 'invalid-email':
+          error = 'The email address is badly formatted.';
+          break;
+        case 'network-request-failed':
+          error = 'No internet connection. Please check your network.';
+          break;
+        default:
+          error = 'Authentication error: ${e.message}';
       }
     } catch (e) {
-      print(e.toString());
-      if (e is FirebaseAuthException) {
-        switch (e.code) {
-          case 'user-not-found':
-            error = 'No user found for that email.';
-            break;
-          case 'wrong-password':
-            error = 'Wrong password provided for that email.';
-            break;
-          case 'invalid-email':
-            error = 'The email address is badly formatted.';
-            break;
-          default:
-            error = 'An unknown error occurred. Please try again.';
-        }
-      } else {
-        error = e.toString();
-      }
-      status = Status.error;
-      notifyListeners();
+      error = 'An unexpected error occurred: $e';
     } finally {
       isLoading = false;
+      status = status == Status.initial ? Status.error : status;
       notifyListeners();
     }
   }
@@ -71,36 +68,45 @@ class AuthProvider extends ChangeNotifier {
     error = "";
     status = Status.initial;
     notifyListeners();
+
     try {
       userCredential = await _auth.createUserWithEmailAndPassword(
           email: email, password: password);
       final user = userCredential.user;
+
       if (user != null) {
         await FirebaseFirestore.instance
             .collection(Constants.collection)
             .doc(user.uid)
-            .set({
-          'uid': user.uid,
-          'email': user.email,
-          'name': name,
-        }).then(
-          (value) {
-            print('authenticated');
-          },
-        );
+            .set({'uid': user.uid, 'email': user.email, 'name': name});
+        status = Status.loggedIn;
+        print('User registered successfully');
       } else {
+        error = 'Failed to create account.';
         status = Status.error;
-        error = 'Error creating account';
-        notifyListeners();
-        print('unauthenticated');
+      }
+    } on FirebaseAuthException catch (e) {
+      switch (e.code) {
+        case 'email-already-in-use':
+          error = 'The email address is already in use by another account.';
+          break;
+        case 'weak-password':
+          error = 'The password provided is too weak.';
+          break;
+        case 'invalid-email':
+          error = 'The email address is badly formatted.';
+          break;
+        case 'network-request-failed':
+          error = 'No internet connection. Please check your network.';
+          break;
+        default:
+          error = 'Registration error: ${e.message}';
       }
     } catch (e) {
-      status = Status.error;
-      error = e.toString();
-      notifyListeners();
-      print(error);
+      error = 'An unexpected error occurred: $e';
     } finally {
       isLoading = false;
+      status = status == Status.initial ? Status.error : status;
       notifyListeners();
     }
   }
@@ -108,11 +114,15 @@ class AuthProvider extends ChangeNotifier {
   Future<void> logOut() async {
     status = Status.initial;
     notifyListeners();
-    await _auth.signOut().then(
-      (value) {
-        status = Status.loggedOut;
-        notifyListeners();
-      },
-    );
+
+    await _auth.signOut().then((_) {
+      status = Status.loggedOut;
+      print('User logged out');
+      notifyListeners();
+    }).catchError((e) {
+      error = 'Logout failed: $e';
+      status = Status.error;
+      notifyListeners();
+    });
   }
 }

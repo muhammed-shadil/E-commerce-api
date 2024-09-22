@@ -85,7 +85,9 @@ class HomeCardWidget extends StatelessWidget {
               children: [
                 Text(
                   "\$${product.price.toStringAsFixed(2)}", // Original price
-                  style: Styles.hashStyle,
+                  style: showDiscountedPrice
+                      ? Styles.hashStyle
+                      : Styles.middtextStyle,
                 ),
                 const SizedBox(width: 5), // Space between prices
                 if (showDiscountedPrice) ...[

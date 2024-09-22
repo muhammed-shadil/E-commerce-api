@@ -4,11 +4,11 @@ import 'package:mechine_test_pinkolearn/core/constants.dart';
 
 class MainButton extends StatelessWidget {
   const MainButton({
-    Key? key,
+    super.key,
     // required this.buttontext,
     this.onpressed,
     this.child,
-  }) : super(key: key);
+  });
   // final String? buttontext;
   final Function()? onpressed;
   final Widget? child;

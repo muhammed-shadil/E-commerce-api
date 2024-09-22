@@ -1,9 +1,8 @@
 import 'dart:convert';
-
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart';
-
-import 'package:mechine_test_pinkolearn/data/product%20model.dart';
+import 'package:mechine_test_pinkolearn/data/product model.dart';
 import 'package:mechine_test_pinkolearn/domain/api_repository/api_repository.dart';
 
 class ProductProvider extends ChangeNotifier {
@@ -12,24 +11,34 @@ class ProductProvider extends ChangeNotifier {
   String error = '';
   final Apirepository apirepository = Apirepository();
 
-  
-  void fetchproduts() async {
+  void fetchProducts() async {
     isLoading = true;
     error = "";
     notifyListeners();
+    
     try {
       final Response response = await apirepository.fetchProduct();
-      final data = jsonDecode(response.body);
+      
       if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
         products = Products.fromMap(data);
-        notifyListeners();
-        print('success');
-        print(products!.products[1].brand);
+        print('Fetch success');
+      } else if (response.statusCode == 404) {
+        error = 'Products not found';
+        print('Error: Products not found');
       } else {
-        print('failed');
+        error = 'Failed to load products. Please try again later.';
+        print('Error: ${response.statusCode}');
       }
+    } on SocketException {
+      error = 'No internet connection. Please check your network.';
+      print('Error: No internet connection');
+    } on FormatException {
+      error = 'Bad response format. Failed to parse data.';
+      print('Error: Bad response format');
     } catch (e) {
-      print(e.toString());
+      error = 'An unexpected error occurred: $e';
+      print('Error: $e');
     } finally {
       isLoading = false;
       notifyListeners();
