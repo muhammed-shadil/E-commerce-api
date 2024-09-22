@@ -36,6 +36,7 @@ class AuthProvider extends ChangeNotifier {
         notifyListeners();
       }
     } catch (e) {
+      print(e.toString());
       if (e is FirebaseAuthException) {
         switch (e.code) {
           case 'user-not-found':

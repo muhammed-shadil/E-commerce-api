@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:mechine_test_pinkolearn/presentation/provider/remot_cofig_provider.dart';
+import 'package:provider/provider.dart';
 import 'package:mechine_test_pinkolearn/core/constants.dart';
 import 'package:mechine_test_pinkolearn/presentation/provider/product_provider.dart';
 
@@ -23,6 +25,10 @@ class HomeCardWidget extends StatelessWidget {
     // Calculate discounted price
     final discountedPrice =
         product.price * (1 - (product.discountPercentage / 100));
+
+    // Access RemoteConfigProvider to get the showDiscountedPrice value
+    final showDiscountedPrice =
+        Provider.of<RemoteConfigProvider>(context).showDiscountedPrice;
 
     return Container(
       width: cardWidth, // Responsive width for each card
@@ -82,15 +88,17 @@ class HomeCardWidget extends StatelessWidget {
                   style: Styles.hashStyle,
                 ),
                 const SizedBox(width: 5), // Space between prices
-                Text(
-                  "\$${discountedPrice.toStringAsFixed(2)}", // Discounted price
-                  style: Styles.middtextStyle,
-                ),
-                const SizedBox(width: 5), // Space before discount text
-                Text(
-                  "${product.discountPercentage}% off", // Discount percentage
-                  style: Styles.greenstyle,
-                ),
+                if (showDiscountedPrice) ...[
+                  Text(
+                    "\$${discountedPrice.toStringAsFixed(2)}", // Discounted price
+                    style: Styles.middtextStyle,
+                  ),
+                  const SizedBox(width: 5), // Space before discount text
+                  Text(
+                    "${product.discountPercentage}% off", // Discount percentage
+                    style: Styles.greenstyle,
+                  ),
+                ],
               ],
             ),
           ),

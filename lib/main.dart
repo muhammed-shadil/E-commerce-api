@@ -5,6 +5,7 @@ import 'package:mechine_test_pinkolearn/firebase_options.dart';
 import 'package:mechine_test_pinkolearn/presentation/provider/auth_provider.dart'
     as local; // Prefix added
 import 'package:mechine_test_pinkolearn/presentation/provider/product_provider.dart';
+import 'package:mechine_test_pinkolearn/presentation/provider/remot_cofig_provider.dart';
 import 'package:mechine_test_pinkolearn/presentation/view/authentication/view/signup_screen.dart';
 import 'package:mechine_test_pinkolearn/presentation/view/home/view/home_screen.dart';
 import 'package:provider/provider.dart';
@@ -30,6 +31,9 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(
           create: (context) => local.AuthProvider(), // Use prefix here
         ),
+        ChangeNotifierProvider(
+          create: (_) => RemoteConfigProvider(),
+        )
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
