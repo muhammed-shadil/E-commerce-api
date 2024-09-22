@@ -11,6 +11,8 @@ class Constants {
   static const Color backgroundcolor = Color.fromARGB(255, 234, 235, 238);
   static const Color black = Colors.black;
   static const Color white = Colors.white;
+     static const Color baseColor= Color.fromARGB(255, 228, 225, 225);
+                        
 }
 
 ////////////////////////////////////////////////////

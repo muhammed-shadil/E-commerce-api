@@ -13,7 +13,6 @@ class AuthProvider extends ChangeNotifier {
   bool isLoading = false;
   String error = '';
   Status status = Status.initial;
-
   Future<void> logIn({
     required String email,
     required String password,
@@ -22,6 +21,7 @@ class AuthProvider extends ChangeNotifier {
     error = "";
     status = Status.initial;
     notifyListeners();
+
     try {
       userCredential = await _auth.signInWithEmailAndPassword(
           email: email, password: password);
@@ -36,8 +36,24 @@ class AuthProvider extends ChangeNotifier {
         notifyListeners();
       }
     } catch (e) {
+      if (e is FirebaseAuthException) {
+        switch (e.code) {
+          case 'user-not-found':
+            error = 'No user found for that email.';
+            break;
+          case 'wrong-password':
+            error = 'Wrong password provided for that email.';
+            break;
+          case 'invalid-email':
+            error = 'The email address is badly formatted.';
+            break;
+          default:
+            error = 'An unknown error occurred. Please try again.';
+        }
+      } else {
+        error = e.toString();
+      }
       status = Status.error;
-      error = e.toString();
       notifyListeners();
     } finally {
       isLoading = false;

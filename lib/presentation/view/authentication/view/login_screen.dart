@@ -1,6 +1,4 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:mechine_test_pinkolearn/presentation/provider/auth_provider.dart';
 import 'package:mechine_test_pinkolearn/presentation/view/authentication/view/signup_screen.dart';
 import 'package:mechine_test_pinkolearn/presentation/view/home/view/home_screen.dart';
@@ -27,7 +25,7 @@ class LoginScreen extends StatelessWidget {
         automaticallyImplyLeading: false,
         titleTextStyle: Styles.titlestyle,
         backgroundColor: Constants.backgroundcolor,
-        title: Text(
+        title: const Text(
           "e-Shop",
         ),
       ),
@@ -41,6 +39,7 @@ class LoginScreen extends StatelessWidget {
               Padding(
                 padding: const EdgeInsets.symmetric(vertical: 12),
                 child: MainTextfield(
+                  controller: email,
                   hinttext: "Email",
                   keyboard: TextInputType.name,
                   validator: (value) {
@@ -55,6 +54,7 @@ class LoginScreen extends StatelessWidget {
                 ),
               ),
               MainTextfield(
+                controller: password,
                 hinttext: "Password",
                 keyboard: TextInputType.name,
                 validator: (value) {
@@ -69,9 +69,36 @@ class LoginScreen extends StatelessWidget {
               ),
               const Spacer(),
               MainButton(
-                onpressed: () {
-                  Navigator.push(context,
-                      MaterialPageRoute(builder: (_) => const HomeScreen()));
+                onpressed: () async {
+                  if (formKey.currentState!.validate()) {
+                    if (authProvider.status == Status.initial) {
+                      ScaffoldMessenger.of(context)
+                        ..hideCurrentSnackBar()
+                        ..showSnackBar(
+                          const SnackBar(content: Text('Please Wait...')),
+                        );
+                    }
+                    await authProvider
+                        .logIn(
+                            email: email.text.trim(),
+                            password: password.text.trim())
+                        .then(
+                      (value) {
+                        if (authProvider.status == Status.error) {
+                          ScaffoldMessenger.of(context)
+                            ..hideCurrentSnackBar()
+                            ..showSnackBar(
+                              SnackBar(content: Text(authProvider.error)),
+                            );
+                        } else if (authProvider.status == Status.loggedIn) {
+                          Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (_) => const HomeScreen()));
+                        }
+                      },
+                    );
+                  }
                 },
                 child: const Text(
                   "Login",

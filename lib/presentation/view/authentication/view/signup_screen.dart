@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mechine_test_pinkolearn/presentation/provider/auth_provider.dart';
+import 'package:mechine_test_pinkolearn/presentation/view/authentication/view/login_screen.dart';
 import 'package:mechine_test_pinkolearn/presentation/view/authentication/widgets/main_button.dart';
 import 'package:mechine_test_pinkolearn/presentation/view/authentication/widgets/main_textfield.dart';
 import 'package:mechine_test_pinkolearn/core/constants.dart';
@@ -128,7 +129,7 @@ class SignupScreen extends StatelessWidget {
                             Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                    builder: (_) => SignupScreen()));
+                                    builder: (_) => LoginScreen()));
                           },
                           child: const Text("Login", style: Styles.titlestyle))
                     ],

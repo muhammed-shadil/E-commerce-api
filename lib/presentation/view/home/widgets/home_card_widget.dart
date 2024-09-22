@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:mechine_test_pinkolearn/core/constants.dart';
+import 'package:mechine_test_pinkolearn/presentation/provider/product_provider.dart';
 
 class HomeCardWidget extends StatelessWidget {
-  const HomeCardWidget({super.key});
+  const HomeCardWidget(
+      {super.key, required this.productprovider, required this.index});
+  final int index;
+  final ProductProvider productprovider;
 
   @override
   Widget build(BuildContext context) {
@@ -11,12 +15,20 @@ class HomeCardWidget extends StatelessWidget {
 
     // Calculate width based on screen size
     final cardWidth = size.width * 0.45;
-    final imageHeight = cardWidth * 1.2; // Adjust image height ratio
+    final imageHeight = cardWidth * 0.8; // Adjust image height ratio
+
+    // Fetch the product details
+    final product = productprovider.products!.products[index];
+
+    // Calculate discounted price
+    final discountedPrice =
+        product.price * (1 - (product.discountPercentage / 100));
 
     return Container(
       width: cardWidth, // Responsive width for each card
       padding: const EdgeInsets.all(8),
-      margin: const EdgeInsets.only(bottom: 10), // Add margin for space between rows
+      margin: const EdgeInsets.only(
+          bottom: 10), // Add margin for space between rows
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(10),
         color: Constants.white,
@@ -38,43 +50,49 @@ class HomeCardWidget extends StatelessWidget {
             height: imageHeight, // Dynamic image height
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(10),
-              image: const DecorationImage(
+              image: DecorationImage(
                 fit: BoxFit.cover,
-                image: NetworkImage(
-                  "https://www.cnet.com/a/img/resize/b8f872ad3c40aabc68bc88ac8a79b1470ed7b9c6/hub/2024/05/07/0ceb2dd9-4fc6-417e-9042-f58b36fab653/iphone-16-rumors-00000.jpg?auto=webp&fit=crop&height=675&width=1200",
-                ),
+                image: NetworkImage(product.images[0]),
               ),
             ),
           ),
-          const Padding(
-            padding: EdgeInsets.symmetric(vertical: 8.0),
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 5.0),
             child: Text(
-              "iPhone 9", // Product title
+              product.title, // Product title
+              maxLines: 2,
               style: Styles.cardtitlestyle, // Use your own style definition
             ),
           ),
-          const Text(
-            "An apple mobile which is nothing like apple _", // Product description
+          Text(
+            product.description, // Product description
             style: Styles.textStyle, // Ensure text styling is consistent
-            maxLines: 2,
+            maxLines: 3,
             overflow: TextOverflow.ellipsis, // Ellipsis for overflow
           ),
           const Spacer(),
           // Price and discount section
-          Row(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              const Text("\$549", // Original price
-                  style: Styles.hashStyle),
-              const SizedBox(width: 5), // Space between prices
-              const Text("\$499", // Discounted price
-                  style: Styles.middtextStyle),
-              const SizedBox(width: 5), // Space before discount text
-              Text(
-                "12.5% off", // Discount percentage
-                style: Styles.greenstyle,
-              ),
-            ],
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                Text(
+                  "\$${product.price.toStringAsFixed(2)}", // Original price
+                  style: Styles.hashStyle,
+                ),
+                const SizedBox(width: 5), // Space between prices
+                Text(
+                  "\$${discountedPrice.toStringAsFixed(2)}", // Discounted price
+                  style: Styles.middtextStyle,
+                ),
+                const SizedBox(width: 5), // Space before discount text
+                Text(
+                  "${product.discountPercentage}% off", // Discount percentage
+                  style: Styles.greenstyle,
+                ),
+              ],
+            ),
           ),
         ],
       ),
